@@ -135,8 +135,9 @@ class Game {
     this.newRound();
   }
 
-  addLog(text, kind) { this.log.push({ text, kind }); if (this.log.length > 150) this.log.shift(); }
-  emit(e) { this.events.push({ id: ++this.evId, ...e }); if (this.events.length > 40) this.events.shift(); }
+  // cstep: gehört zum Zählen und wird jedem erst gezeigt, wenn er so weit geklickt hat
+  addLog(text, kind) { this.log.push({ text, kind, cstep: this.cstep ?? undefined }); if (this.log.length > 150) this.log.shift(); }
+  emit(e) { this.events.push({ id: ++this.evId, cstep: this.cstep ?? undefined, ...e }); if (this.events.length > 80) this.events.shift(); }
 
   award(p, pts, why, items) {
     if (this.over || pts <= 0) return;
@@ -161,7 +162,7 @@ class Game {
     this.crib = []; this.starter = null; this.phase = 'discard';
     this.seqs = [{ cards: [], end: null }]; // alle Auslege-Folgen der Runde bleiben sichtbar
     this.count = 0; this.peg = null; this.turn = null; this.lastPlayer = null;
-    this.step = -1; this.breakdown = null;
+    this.csteps = null; this.cview = [-1, -1]; this.cstep = null;
     this.addLog(`Neue Runde – Geber: ${this.names[this.dealer]}`, 'round');
     this.emit({ kind: 'round' });
   }
@@ -176,13 +177,11 @@ class Game {
 
   // Aktion eines Spielers; wirft Error mit konkretem Text bei ungültigem Zug
   act(p, a) {
-    if (this.over) throw new Error('Das Spiel ist vorbei.');
+    const counting = this.csteps && this.cview[p] < this.csteps.length;
+    if (this.over && !(a.type === 'next' && counting)) throw new Error('Das Spiel ist vorbei.');
     if (a.type === 'discard') return this.discard(p, a.cards);
     if (a.type === 'play') return this.play(p, a.card);
-    if (a.type === 'next') {
-      if (this.phase === 'count' && a.step !== this.step) return; // beide haben gleichzeitig geklickt
-      return this.nextCount();
-    }
+    if (a.type === 'next') return this.nextCount(p, a.step);
     throw new Error('Unbekannte Aktion: ' + a.type);
   }
 
@@ -263,9 +262,8 @@ class Game {
           this.seqs[this.seqs.length - 1].end = { type: 'last', p: this.lastPlayer };
         }
         if (this.over) return;
-        this.phase = 'count'; this.step = -1; this.breakdown = null;
         this.addLog('Alle Karten gelegt – jetzt wird gezählt.');
-        return;
+        return this.startCount();
       }
       const p = this.turn, o = 1 - p;
       if (this.canPlay(p)) return;
@@ -286,32 +284,56 @@ class Game {
     }
   }
 
-  nextCount() {
-    if (this.phase !== 'count') throw new Error('Gerade wird nicht gezählt.');
-    this.step++;
+  // Alle drei Zählungen gleich berechnen; jeder Spieler klickt sie in seinem Tempo durch
+  startCount() {
+    this.phase = 'count';
     const nd = 1 - this.dealer, d = this.dealer;
-    const steps = [
+    const defs = [
       { p: nd, cards: this.hands[nd], label: `Hand von ${this.names[nd]}` },
       { p: d, cards: this.hands[d], label: `Hand von ${this.names[d]}` },
       { p: d, cards: this.crib, label: `Krippe von ${this.names[d]}` },
     ];
-    if (this.step >= steps.length) { this.dealer = 1 - this.dealer; return this.newRound(); }
-    const s = steps[this.step], items = scoreHand(s.cards, this.starter), pts = total(items);
-    this.breakdown = { ...s, items, pts };
-    this.emit({ kind: 'count', p: s.p, pts });
-    const T = this.tally[s.p];
-    T[this.step === 2 ? 'crib' : 'hand'] += pts;
-    T.best = Math.max(T.best, pts);
-    if (items.some(i => i.flush)) T.flush++;
-    if (!pts) T.zero++;
-    if (pts) this.award(s.p, pts, `${s.label}: ${items.map(itemText).join(', ')}`, [{ t: s.label.split(' ')[0], p: pts }]);
-    else this.addLog(`${s.label}: 19 🤡 – 0 Punkte (${fmtAll(s.cards)} + ${fmt(this.starter)})`);
+    const snap = () => ({ score: [...this.score], back: [...this.back], tally: this.tally.map(t => ({ ...t })) });
+    this.cbase = snap();
+    this.csteps = []; this.cview = [-1, -1];
+    for (let k = 0; k < defs.length && !this.over; k++) {
+      this.cstep = k;
+      const s = defs[k], items = scoreHand(s.cards, this.starter), pts = total(items);
+      this.emit({ kind: 'count', p: s.p, pts });
+      const T = this.tally[s.p];
+      T[k === 2 ? 'crib' : 'hand'] += pts;
+      T.best = Math.max(T.best, pts);
+      if (items.some(i => i.flush)) T.flush++;
+      if (!pts) T.zero++;
+      if (pts) this.award(s.p, pts, `${s.label}: ${items.map(itemText).join(', ')}`, [{ t: s.label.split(' ')[0], p: pts }]);
+      else this.addLog(`${s.label}: 19 🤡 – 0 Punkte (${fmtAll(s.cards)} + ${fmt(this.starter)})`);
+      this.csteps.push({ ...s, items, pts, ...snap() });
+    }
+    this.cstep = null;
   }
+
+  nextCount(p, step) {
+    if (!this.csteps) throw new Error('Gerade wird nicht gezählt.');
+    if (step !== undefined && step !== this.cview[p]) return; // doppelt geklickt
+    if (this.cview[p] >= this.csteps.length) return;
+    this.cview[p]++;
+    if (!this.over && this.cview[0] >= this.csteps.length && this.cview[1] >= this.csteps.length) {
+      this.dealer = 1 - this.dealer;
+      this.newRound();
+    }
+  }
+
 
   // Was Spieler p sehen darf
   view(p) {
     const o = 1 - p;
-    const reveal = this.phase === 'count' || this.phase === 'over';
+    // Beim Zählen sieht jeder nur, was er schon durchgeklickt hat
+    const cs = this.csteps, vstep = cs ? this.cview[p] : -1;
+    const shownStep = cs ? Math.min(vstep, cs.length - 1) : -1;
+    const snap = cs ? (shownStep >= 0 ? cs[shownStep] : this.cbase) : null;
+    const phase = this.over ? (cs && vstep < cs.length - 1 ? 'count' : 'over') : this.phase;
+    const reveal = phase === 'count' || phase === 'over';
+    const visible = x => x.cstep === undefined || x.cstep <= vstep;
     const oppCards = this.phase === 'peg' ? this.peg[o] : this.hands[o];
     // Bewertungen des Gegners aus der laufenden Runde erst nach dem Auslegen zeigen (sonst verraten sie seine Karten)
     const decisions = this.decisions.filter(d => d.p === p || d.round < this.round || reveal);
@@ -325,17 +347,19 @@ class Game {
       return s;
     });
     return {
-      phase: this.phase, me: p, names: this.names, score: this.score, back: this.back, dealer: this.dealer,
-      winner: this.winner, win: WIN, round: this.round,
+      phase, me: p, names: this.names, dealer: this.dealer,
+      score: snap ? snap.score : this.score, back: snap ? snap.back : this.back,
+      winner: phase === 'over' ? this.winner : null, win: WIN, round: this.round,
       hand: this.phase === 'peg' ? this.peg[p] : this.hands[p],
       opp: reveal ? oppCards : oppCards.map(() => null),
-      crib: this.crib.map(c => (reveal && (this.step >= 2 || this.phase === 'over') ? c : null)),
+      crib: this.crib.map(c => (reveal && (shownStep >= 2 || phase === 'over') ? c : null)),
       starter: this.starter, seqs: this.seqs, count: this.count, turn: this.turn,
       discarded: this.discards.map(Boolean),
-      breakdown: this.breakdown, step: this.step,
-      log: this.log.slice(-80), events: this.events,
+      breakdown: shownStep >= 0 ? cs[shownStep] : null, step: vstep, steps: cs ? cs.length : 0,
+      oppStep: cs ? this.cview[o] : -1,
+      log: this.log.filter(visible).slice(-80), events: this.events.filter(visible),
       stats, decisions: decisions.slice(-60),
-      tally: this.tally,
+      tally: snap ? snap.tally : this.tally,
     };
   }
 }

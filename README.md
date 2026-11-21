@@ -15,6 +15,7 @@ Cribbage im Browser für genau zwei Spieler, als kleiner Docker-Container (Node,
 - 0 Punkte heißen „19“ – mit Clown und Clownslachen
 - Bewertung in %: wie gut war die Krippen-Auswahl und jede ausgelegte Karte – gemessen an den erwarteten Punkten mit dem, was man in dem Moment wissen konnte; dazu „gut gespielt“ gesamt und der direkte Vergleich beider Spieler
 - Siegerehrung mit Podest und Vergleichstabelle
+- Zählen im eigenen Tempo: jeder klickt die Hände selbst durch, weiter geht es erst, wenn beide fertig sind
 - Kartenmotive: Klassisch, Tierisch, Monster, Futter, Weltall (pro Browser wählbar)
 - Junge (J) statt Bube
 

@@ -266,7 +266,7 @@ const store = {
   get(){ try { return localStorage.getItem('cribbageToken') || ''; } catch { return ''; } },
   set(t){ try { t ? localStorage.setItem('cribbageToken', t) : localStorage.removeItem('cribbageToken'); } catch {} }
 };
-let token = store.get(), S = null, sel = new Set(), err = '', es = null, lastEv = null;
+let token = store.get(), S = null, sel = new Set(), err = '', es = null, seen = null;
 
 function connect(){
   if (es) es.close();
@@ -297,12 +297,12 @@ function popup(html, at, cls, delay){
 }
 function effects(before){
   const g = S && S.game;
-  if (!g){ lastEv = null; return; }
+  if (!g){ seen = null; return; }
   const evs = g.events;
-  if (lastEv === null){ lastEv = evs.length ? evs[evs.length - 1].id : 0; return; } // beim Laden nichts nachspielen
-  const fresh = evs.filter(e => e.id > lastEv);
+  if (seen === null){ seen = new Set(evs.map(e => e.id)); return; } // beim Laden nichts nachspielen
+  const fresh = evs.filter(e => !seen.has(e.id));
+  fresh.forEach(e => seen.add(e.id));
   if (!fresh.length) return;
-  lastEv = fresh[fresh.length - 1].id;
   const me = g.me, side = p => (p === me ? 0 : 1);
   let t = 0, prev = null;
   for (const e of fresh){
@@ -720,8 +720,9 @@ function render(){
   else if (g.phase === 'discard') m = g.discarded[me] ? `Warte, bis ${N[op]} 2 Karten in die Krippe gelegt hat.`
     : `Wähle 2 Karten für ${g.dealer === me ? 'deine Krippe' : 'die Krippe von ' + N[op]}`;
   else if (g.phase === 'peg') m = myTurn ? 'Lege eine Karte' : `${N[op]} ist dran …`;
-  else if (g.phase === 'count' && g.step < 0) m = 'Alle Karten liegen – schaut sie euch an, dann wird gezählt.';
-  else if (g.phase === 'count') m = '';
+  else if (g.phase === 'count' && g.step < 0) m = 'Alle Karten liegen – schau sie dir in Ruhe an, dann zählen.';
+  else if (g.phase === 'count' && g.step >= g.steps) m = `Du bist fertig. Warte, bis ${N[op]} auch fertig angeschaut hat (${N[op]} ist bei ${g.oppStep < 0 ? 'den ausgelegten Karten' : 'Zählung ' + Math.min(g.oppStep + 1, g.steps) + ' von ' + g.steps}).`;
+  else if (g.phase === 'count') m = g.oppStep >= g.steps ? `${N[op]} ist schon fertig und wartet auf dich.` : '';
   $('msg').className = 'prompt' + (err ? ' err' : '');
   $('msg').textContent = err || m;
 
@@ -734,7 +735,8 @@ function render(){
   $('dropHint').textContent = !canDrop ? '' : g.phase === 'discard'
     ? `Karten hierher ziehen oder anklicken – ${sel.size} von 2 für die Krippe`
     : 'Karte hierher ziehen oder anklicken';
-  if (g.phase === 'count') btn(g.step < 0 ? 'Hände zählen' : g.step < 2 ? 'Weiter zählen' : 'Nächste Runde', () => act({type: 'next', step: g.step}));
+  if (g.phase === 'count' && g.step < g.steps)
+    btn(g.step < 0 ? 'Hände zählen' : g.step < g.steps - 1 ? `Weiter zählen (${g.step + 2} von ${g.steps})` : 'Fertig angeschaut', () => act({type: 'next', step: g.step}));
   renderStats(g);
   renderCeremony(g);
   if (g.phase === 'over') btn('Neues Spiel', () => act({type: 'newgame'}));

@@ -25,7 +25,7 @@ for (let n = 0; n < 30; n++) {
   while (!g.over && guard++ < 5000) {
     if (g.phase === 'discard') { for (const p of [0, 1]) if (!g.discards[p]) g.act(p, { type: 'discard', cards: g.hands[p].slice(0, 2).map(x => x.id) }); }
     else if (g.phase === 'peg') { const card = g.peg[g.turn].find(x => g.count + Math.min(x.r, 10) <= 31); g.act(g.turn, { type: 'play', card: card.id }); }
-    else if (g.phase === 'count') g.act(0, { type: 'next', step: g.step });
+    else if (g.phase === 'count') { for (const p of [0, 1]) if (g.cview[p] < g.csteps.length) g.act(p, { type: 'next', step: g.cview[p] }); }
   }
   assert.ok(g.over && Math.max(...g.score) === 121, 'Spiel endet bei 121');
 }
@@ -45,3 +45,24 @@ console.log('Alle Tests bestanden.');
   assert.strictEqual(w.decisions.length, 0, 'gegnerische Bewertung erst nach dem Auslegen');
 }
 console.log('Bewertungstests bestanden.');
+
+// Zählen im eigenen Tempo: erst wenn beide durch sind, geht es weiter
+{
+  let g;
+  do {
+    g = new Game(['A', 'B']);
+    for (const p of [0, 1]) g.act(p, { type: 'discard', cards: g.hands[p].slice(0, 2).map(x => x.id) });
+    while (g.phase === 'peg') { const card = g.peg[g.turn].find(x => g.count + Math.min(x.r, 10) <= 31); g.act(g.turn, { type: 'play', card: card.id }); }
+  } while (g.over);
+  const before = g.view(1).score.slice();
+  g.act(0, { type: 'next', step: -1 });
+  g.act(0, { type: 'next', step: 0 });
+  assert.strictEqual(g.view(0).step, 1, 'A ist bei Schritt 1');
+  assert.deepStrictEqual(g.view(1).score, before, 'B sieht noch den alten Stand');
+  assert.strictEqual(g.view(1).breakdown, null, 'B sieht noch keine Zählung');
+  g.act(0, { type: 'next', step: 1 }); g.act(0, { type: 'next', step: 2 });
+  assert.strictEqual(g.round, 1, 'A ist fertig, aber B noch nicht – keine neue Runde');
+  for (let k = -1; k < 3; k++) g.act(1, { type: 'next', step: k });
+  assert.strictEqual(g.round, 2, 'beide fertig – neue Runde');
+}
+console.log('Tempo-Tests bestanden.');
