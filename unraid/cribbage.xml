@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>cribbage</Name>
+  <Repository>ghcr.io/spidobot/cribbage:latest</Repository>
+  <Registry>https://github.com/spidobot/cribbage/pkgs/container/cribbage</Registry>
+  <Network>bridge</Network>
+  <Shell>sh</Shell>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/spidobot/cribbage</Support>
+  <Project>https://github.com/spidobot/cribbage</Project>
+  <Overview>Cribbage im Browser für zwei Spieler. Hausregel: Flush zählt immer.</Overview>
+  <Category>GameServers:</Category>
+  <WebUI>http://[IP]:[PORT:3000]/</WebUI>
+  <TemplateURL>https://raw.githubusercontent.com/spidobot/cribbage/main/unraid/cribbage.xml</TemplateURL>
+  <Config Name="WebUI-Port" Target="3000" Default="3000" Mode="tcp" Description="Port der Weboberfläche" Type="Port" Display="always" Required="true" Mask="false">3000</Config>
+  <Config Name="Passwort" Target="PASSWORD" Default="" Mode="" Description="Passwort, das beide Spieler beim Hinsetzen eingeben müssen. Leer = kein Passwort." Type="Variable" Display="always" Required="false" Mask="true"></Config>
+</Container>

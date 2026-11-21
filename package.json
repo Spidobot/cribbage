@@ -1,0 +1,9 @@
+{
+  "name": "cribbage",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cribbage für zwei Spieler im Browser – Hausregel: Flush zählt immer",
+  "main": "server.js",
+  "scripts": { "start": "node server.js", "test": "node test.js" },
+  "license": "MIT"
+}

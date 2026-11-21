@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cribbage</title>
+<style>
+:root{
+  --wood1:#a4521c; --wood2:#8a4216; --wood3:#b8662a; --ink:#fff8ec; --muted:#f3d9b8;
+  --gold:#ffd23f; --card:#ffffff; --red:#e0201b; --black:#151515;
+  --p0:#d8452b; --p1:#2f8fd0; --board:#c98a3e; --boardDark:#7a4a1a;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:#5e2c0c;color:var(--ink);font:16px/1.35 system-ui,"Segoe UI",sans-serif}
+.wood{
+  background:
+    repeating-linear-gradient(92deg,rgba(0,0,0,.06) 0 2px,transparent 2px 9px),
+    repeating-linear-gradient(88deg,rgba(255,255,255,.04) 0 1px,transparent 1px 23px),
+    linear-gradient(160deg,var(--wood3),var(--wood1) 40%,var(--wood2) 75%,var(--wood1));
+}
+.hidden{display:none!important}
+
+/* ---------- Beitreten ---------- */
+.join{min-height:100vh;display:grid;place-items:center;padding:16px}
+.joinbox{width:100%;max-width:420px;background:rgba(0,0,0,.35);border-radius:16px;padding:22px}
+.joinbox h1{margin:0 0 6px}
+.joinbox input{font:inherit;width:100%;padding:10px 12px;border-radius:10px;border:0;margin:6px 0 14px}
+
+/* ---------- Tisch ---------- */
+.table{min-height:100vh;display:grid;grid-template-columns:190px minmax(0,1fr) 250px;gap:18px;padding:18px}
+.side{display:flex;flex-direction:column;justify-content:space-between;gap:16px}
+.pbox{border-radius:12px;overflow:hidden;text-align:center;box-shadow:0 4px 10px rgba(0,0,0,.35);border:4px solid transparent;transition:border-color .2s}
+.pbox.turn{border-color:var(--gold)}
+.pbox .face{height:74px;display:grid;place-items:center;font-size:40px;font-weight:800;color:rgba(255,255,255,.92)}
+.pbox.p0 .face{background:var(--p0)} .pbox.p1 .face{background:var(--p1)}
+.pbox .nm{background:#111;color:#fff;padding:3px 6px;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pbox .sc{font-size:38px;font-weight:700;padding:0 0 4px}
+.pbox.p0 .sc{background:var(--p0)} .pbox.p1 .sc{background:var(--p1)}
+.badge{display:inline-block;background:var(--gold);color:#222;font-weight:700;font-size:13px;border-radius:6px;padding:2px 8px;margin-top:6px}
+.deckrow{display:flex;gap:12px;align-items:flex-end}
+.lbl{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:4px;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+
+.center{display:flex;flex-direction:column;gap:12px;min-width:0}
+.hand{display:flex;justify-content:center;min-height:calc(var(--cw) * 1.4);--cw:clamp(58px,8.2vw,112px)}
+.hand .card + .card{margin-left:calc(var(--cw) * -0.12)}
+.felt{border:3px dashed transparent;border-radius:18px;transition:border-color .15s,background .15s}
+.felt.can{border-color:rgba(255,255,255,.25)}
+.felt.over{border-color:var(--gold);background:rgba(255,210,63,.12)}
+.drophint{font-size:15px;color:var(--muted);text-shadow:0 1px 2px rgba(0,0,0,.5);min-height:1.2em}
+.ghost-card{position:fixed;z-index:50;pointer-events:none;transform:rotate(-4deg) scale(1.05);box-shadow:0 12px 24px rgba(0,0,0,.5)!important}
+.card.dragging{opacity:.3}
+.card.click{touch-action:none}
+.felt{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:180px}
+.pile{display:flex;justify-content:center;flex-wrap:wrap;--cw:clamp(48px,6vw,80px);min-height:calc(var(--cw) * 1.4)}
+.pile .card + .card{margin-left:calc(var(--cw) * -0.35)}
+.count{font-size:22px;font-weight:700;text-shadow:0 2px 3px rgba(0,0,0,.5)}
+.count b{color:var(--gold);font-size:30px}
+.prompt{text-align:center;font-size:clamp(20px,2.6vw,34px);text-shadow:0 2px 4px rgba(0,0,0,.6);min-height:1.3em}
+.prompt.err{color:#ffe0dc;background:rgba(150,20,10,.6);border-radius:10px;font-size:18px;padding:8px}
+.actions{display:flex;justify-content:center;gap:10px;min-height:44px}
+button{font:inherit;font-weight:700;background:var(--gold);color:#222;border:0;border-radius:10px;padding:10px 20px;cursor:pointer;box-shadow:0 3px 0 #b08a14}
+button:disabled{opacity:.45;cursor:default}
+button.ghost{background:rgba(0,0,0,.3);color:var(--ink);box-shadow:none;font-weight:600}
+
+/* ---------- Karten ---------- */
+.card{--cw:inherit;width:var(--cw);height:calc(var(--cw) * 1.4);border-radius:calc(var(--cw) * .08);background:var(--card);color:var(--black);
+  position:relative;flex:none;box-shadow:0 2px 6px rgba(0,0,0,.4);user-select:none;transition:transform .12s;font-weight:700}
+.card .ix{position:absolute;left:7%;top:4%;text-align:center;line-height:.95;font-size:calc(var(--cw) * .26)}
+.card .ix i{display:block;font-style:normal;font-size:.8em}
+.card .ix.br{left:auto;top:auto;right:7%;bottom:4%;transform:rotate(180deg)}
+.card .pip{position:absolute;inset:0;display:grid;place-items:center;font-size:calc(var(--cw) * .55)}
+.card .pip.court{font-size:calc(var(--cw) * .42);font-family:Georgia,serif}
+.card .pip.court span{border:2px solid currentColor;border-radius:8px;padding:6% 14%;opacity:.9}
+.card.red{color:var(--red)}
+.card.back{background:
+  radial-gradient(circle at 50% 50%,transparent 28%,rgba(255,255,255,.15) 29% 31%,transparent 32%),
+  repeating-linear-gradient(45deg,#1f6f63 0 5px,#2a8577 5px 10px),#1f6f63;border:calc(var(--cw) * .06) solid #fff}
+.card.click{cursor:grab}
+.card.click:hover{transform:translateY(-10px)}
+.card.sel{transform:translateY(-22px);box-shadow:0 0 0 4px var(--gold),0 6px 12px rgba(0,0,0,.4)}
+.card.dim{filter:brightness(.6)}
+.card.new{animation:drop .25s ease-out}
+@keyframes drop{from{transform:translateY(-18px);opacity:0}}
+.mini{--cw:44px;display:flex}
+.mini .card + .card{margin-left:-26px}
+.starter{--cw:clamp(60px,6vw,86px)}
+
+/* ---------- Brett ---------- */
+.boardwrap{display:flex;flex-direction:column;gap:10px;min-height:0}
+.board{background:linear-gradient(90deg,#8b5523,#c78a44 12%,#d9a05a 50%,#c78a44 88%,#8b5523);border-radius:110px 110px 18px 18px;
+  padding:10px;box-shadow:inset 0 0 0 5px var(--boardDark),0 6px 14px rgba(0,0,0,.45);flex:1;display:flex}
+.board svg{width:100%;height:100%;max-height:82vh}
+
+/* ---------- Zählung & Verlauf ---------- */
+.breakdown{background:rgba(0,0,0,.4);border-radius:12px;padding:12px 16px;max-width:560px;width:100%}
+.breakdown h3{margin:0 0 8px;font-size:18px}
+.breakdown ul{margin:8px 0 0;padding-left:20px}
+.breakdown .zero{color:var(--muted)}
+.flush{color:var(--gold);font-weight:700}
+details.logbox{background:rgba(0,0,0,.35);border-radius:12px;padding:8px 12px;font-size:14px}
+details.logbox summary{cursor:pointer;font-weight:700}
+.log{max-height:260px;overflow:auto;margin-top:6px}
+.log div{padding:4px 0;border-bottom:1px solid rgba(255,255,255,.12)}
+.log .round{color:var(--muted);font-size:12px;text-transform:uppercase;padding-top:8px}
+.log .win{color:var(--gold);font-weight:700}
+.rule{font-size:13px;color:var(--muted)}
+
+@media (max-width:900px){
+  .table{grid-template-columns:1fr;padding:12px;gap:12px}
+  .side{flex-direction:row;align-items:stretch}
+  .side .pbox{flex:1}
+  .side .pbox .face{height:44px;font-size:26px}
+  .side .pbox .sc{font-size:28px}
+  .side .deckrow{order:3}
+  .hand{--cw:clamp(52px,17vw,96px)}
+  .boardwrap .board{border-radius:80px 80px 14px 14px;width:170px;margin:0 auto;flex:none}
+  .board svg{max-height:none;height:auto}
+}
+</style>
+</head>
+<body class="wood">
+<div class="join hidden" id="join">
+  <div class="joinbox">
+    <h1>Cribbage</h1>
+    <div class="rule" id="joinInfo" style="margin-bottom:14px"></div>
+    <label>Dein Name<input id="name" maxlength="20" autocomplete="nickname"></label>
+    <label id="codeWrap" class="hidden">Passwort<input id="code" type="password" autocomplete="current-password"></label>
+    <button id="joinBtn">Hinsetzen</button>
+    <div class="prompt err hidden" id="joinErr" style="margin-top:14px"></div>
+  </div>
+</div>
+
+<div class="table hidden" id="app">
+  <div class="side">
+    <div id="oppBox"></div>
+    <div class="deckrow">
+      <div><div class="lbl">Start</div><div class="starter" id="starter"></div></div>
+      <div><div class="lbl" id="cribLabel">Krippe</div><div class="mini" id="crib"></div></div>
+    </div>
+    <div id="meBox"></div>
+  </div>
+
+  <div class="center">
+    <div class="hand" id="opp"></div>
+    <div class="felt" id="drop">
+      <div class="drophint" id="dropHint"></div>
+      <div class="pile" id="pile"></div>
+      <div class="count" id="countWrap">Zählstand <b id="count">0</b></div>
+      <div id="breakdown" class="breakdown hidden"></div>
+    </div>
+    <div class="prompt" id="msg"></div>
+    <div class="actions" id="actions"></div>
+    <div class="hand" id="me"></div>
+  </div>
+
+  <div class="boardwrap">
+    <div class="board"><svg id="board" viewBox="0 0 200 660" aria-label="Zählbrett"></svg></div>
+    <details class="logbox">
+      <summary>Verlauf</summary>
+      <div class="log" id="log"></div>
+    </details>
+    <div class="rule"><b>Flush zählt immer:</b> Hand und Krippe ab 4 Karten einer Farbe (+1 mit passender Startkarte), beim Auslegen ab 3 gleichfarbigen Karten in Folge, 1 Punkt pro Karte.</div>
+    <button class="ghost" id="leaveBtn">Tisch verlassen</button>
+  </div>
+</div>
+<script>
+const RN = ['','A','2','3','4','5','6','7','8','9','10','B','D','K'];
+const val = c => Math.min(c.r, 10);
+const fmt = c => RN[c.r] + c.s;
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+
+const store = {
+  get(){ try { return localStorage.getItem('cribbageToken') || ''; } catch { return ''; } },
+  set(t){ try { t ? localStorage.setItem('cribbageToken', t) : localStorage.removeItem('cribbageToken'); } catch {} }
+};
+let token = store.get(), S = null, sel = new Set(), err = '', es = null, shownPile = new Set();
+
+function connect(){
+  if (es) es.close();
+  es = new EventSource('/api/events?token=' + encodeURIComponent(token));
+  es.onmessage = e => { S = JSON.parse(e.data); if (S.seat < 0 && token){ token = ''; store.set(''); connect(); } err = ''; render(); };
+}
+async function post(url, body){
+  const r = await fetch(url, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)});
+  const j = await r.json().catch(() => ({error: `Server antwortet mit Status ${r.status}.`}));
+  if (!r.ok) throw new Error(j.error);
+  return j;
+}
+async function act(a){
+  try { await post('/api/action', {token, ...a}); }
+  catch (e){ err = e.message; render(); }
+}
+
+$('joinBtn').onclick = async () => {
+  try {
+    const j = await post('/api/join', {name: $('name').value, code: $('code').value});
+    token = j.token; store.set(token); $('joinErr').classList.add('hidden'); connect();
+  } catch (e){ $('joinErr').textContent = e.message; $('joinErr').classList.remove('hidden'); }
+};
+$('name').onkeydown = $('code').onkeydown = e => { if (e.key === 'Enter') $('joinBtn').click(); };
+$('leaveBtn').onclick = () => { if (confirm('Tisch wirklich verlassen? Das laufende Spiel wird beendet.')) act({type: 'leave'}).then(() => { token = ''; store.set(''); connect(); }); };
+
+function cardEl(c){
+  const d = document.createElement('div');
+  if (!c){ d.className = 'card back'; return d; }
+  d.className = 'card' + (c.s === '♥' || c.s === '♦' ? ' red' : '');
+  const ix = `${RN[c.r]}<i>${c.s}</i>`;
+  const pip = c.r > 10 ? `<div class="pip court"><span>${RN[c.r]}${c.s}</span></div>` : `<div class="pip">${c.s}</div>`;
+  d.innerHTML = `<div class="ix">${ix}</div>${pip}<div class="ix br">${ix}</div>`;
+  return d;
+}
+function discardSel(){ const cards = [...sel]; sel.clear(); act({type: 'discard', cards}); }
+
+/* Ziehen mit Maus oder Finger: kurzer Klick = onClick, auf den Tisch gezogen = onDrop */
+let dragging = false;
+function draggable(el, c, onClick, onDrop){
+  el.addEventListener('pointerdown', e => {
+    if (e.button !== 0) return;
+    e.preventDefault();
+    const sx = e.clientX, sy = e.clientY, r = el.getBoundingClientRect();
+    let ghost = null;
+    const over = ev => { const t = document.elementFromPoint(ev.clientX, ev.clientY); return !!(t && t.closest('#drop')); };
+    const move = ev => {
+      if (!ghost && Math.hypot(ev.clientX - sx, ev.clientY - sy) < 6) return;
+      if (!ghost){
+        dragging = true;
+        ghost = el.cloneNode(true); ghost.classList.add('ghost-card'); ghost.classList.remove('click', 'sel');
+        ghost.style.width = r.width + 'px'; ghost.style.height = r.height + 'px';
+        document.body.appendChild(ghost); el.classList.add('dragging');
+      }
+      ghost.style.left = (ev.clientX - (sx - r.left)) + 'px';
+      ghost.style.top = (ev.clientY - (sy - r.top)) + 'px';
+      $('drop').classList.toggle('over', over(ev));
+    };
+    const up = ev => {
+      window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up); window.removeEventListener('pointercancel', up);
+      $('drop').classList.remove('over');
+      if (!ghost) return onClick();
+      ghost.remove(); el.classList.remove('dragging'); dragging = false;
+      if (ev.type === 'pointerup' && over(ev)) onDrop(); else render();
+    };
+    window.addEventListener('pointermove', move); window.addEventListener('pointerup', up); window.addEventListener('pointercancel', up);
+  });
+}
+
+function fill(id, list){ const el = $(id); el.innerHTML = ''; list.forEach(x => el.appendChild(x)); }
+function itemText(i){
+  const t = esc(i.cs ? `${i.t} für ${i.p} (${i.cs.map(fmt).join(' ')})` : `${i.t} für ${i.p}`);
+  return i.flush ? `<span class="flush">${t}</span>` : t;
+}
+function pbox(g, p, label){
+  const turn = g.phase === 'peg' && g.turn === p;
+  return `<div class="pbox p${p === g.me ? 0 : 1}${turn ? ' turn' : ''}">
+    <div class="face">${esc(g.names[p].slice(0, 1).toUpperCase())}</div>
+    <div class="nm">${esc(label)}</div><div class="sc">${g.score[p]}</div></div>
+    ${g.dealer === p ? '<div style="text-align:center"><span class="badge">Geber</span></div>' : ''}`;
+}
+
+/* Zählbrett: 120 Löcher je Spieler, hoch auf der linken Seite, runter auf der rechten */
+function holePos(n, lane){ // n 1..120, lane 0 = außen, 1 = innen
+  if (n <= 0) return {x: lane ? 62 : 38, y: 640};
+  if (n >= 121) return {x: 100, y: 26};
+  const up = n <= 60, k = up ? n - 1 : 120 - n;
+  const y = 612 - k * 8 - Math.floor(k / 5) * 4;
+  const x = up ? (lane ? 62 : 38) : (lane ? 138 : 162);
+  return {x, y};
+}
+function drawBoard(g){
+  const me = g.me, op = 1 - me;
+  let h = `<path d="M38 88 A62 62 0 0 1 162 88" fill="none" stroke="rgba(0,0,0,.25)" stroke-width="30"/>
+    <path d="M38 88 A62 62 0 0 1 162 88" fill="none" stroke="${'var(--p0)'}" stroke-width="10" opacity=".55"/>
+    <path d="M62 88 A38 38 0 0 1 138 88" fill="none" stroke="${'var(--p1)'}" stroke-width="10" opacity=".55"/>`;
+  h += `<rect x="31" y="88" width="38" height="532" rx="6" fill="rgba(0,0,0,.18)"/><rect x="131" y="88" width="38" height="532" rx="6" fill="rgba(0,0,0,.18)"/>`;
+  h += `<rect x="31" y="88" width="14" height="532" fill="var(--p0)" opacity=".55"/><rect x="155" y="88" width="14" height="532" fill="var(--p0)" opacity=".55"/>`;
+  h += `<rect x="55" y="88" width="14" height="532" fill="var(--p1)" opacity=".55"/><rect x="131" y="88" width="14" height="532" fill="var(--p1)" opacity=".55"/>`;
+  for (let n = 1; n <= 120; n++) for (const lane of [0, 1]){
+    const p = holePos(n, lane); h += `<circle cx="${p.x}" cy="${p.y}" r="2.3" fill="#2a1606"/>`;
+    if (lane === 0 && n % 5 === 0 && n < 120){
+      const q = holePos(n, 1), y = p.y - 6.2;
+      h += `<line x1="${Math.min(p.x, q.x) - 6}" x2="${Math.max(p.x, q.x) + 6}" y1="${y}" y2="${y}" stroke="rgba(42,22,6,.45)" stroke-width=".8"/>`;
+    }
+  }
+  [[30, 'rgba(0,0,0,.35)'], [60, 'rgba(0,0,0,.35)'], [90, 'rgba(0,0,0,.35)']].forEach(([n, c]) => {
+    const p = holePos(n, 0), q = holePos(n, 1);
+    h += `<text x="${(p.x + q.x) / 2}" y="${p.y - 8}" font-size="9" text-anchor="middle" fill="${c}">${n}</text>`;
+  });
+  h += `<circle cx="100" cy="26" r="4" fill="#2a1606"/><text x="100" y="46" font-size="9" text-anchor="middle" fill="rgba(0,0,0,.45)">121</text>`;
+  h += `<rect x="30" y="632" width="40" height="18" rx="4" fill="rgba(0,0,0,.18)"/>`;
+  h += `<circle cx="38" cy="640" r="2.3" fill="#2a1606"/><circle cx="62" cy="640" r="2.3" fill="#2a1606"/>`;
+  const peg = (n, lane, color) => {
+    const p = holePos(n, lane);
+    return `<g transform="translate(${p.x} ${p.y})"><ellipse cx="1.5" cy="2" rx="5" ry="3" fill="rgba(0,0,0,.3)"/>
+      <circle r="5.2" fill="${color}" stroke="rgba(0,0,0,.45)" stroke-width="1"/><circle cx="-1.6" cy="-1.8" r="1.6" fill="rgba(255,255,255,.7)"/></g>`;
+  };
+  [[me, 0, 'var(--p0)'], [op, 1, 'var(--p1)']].forEach(([p, lane, col]) => {
+    if (g.back[p] !== g.score[p]) h += peg(g.back[p], lane, col);
+    h += peg(g.score[p], lane, col);
+  });
+  $('board').innerHTML = h;
+}
+
+function render(){
+  if (!S) return;
+  const seated = S.seat >= 0;
+  $('join').classList.toggle('hidden', seated);
+  $('app').classList.toggle('hidden', !seated);
+  if (!seated){
+    const [a, b] = S.lobby.names;
+    $('joinInfo').textContent = S.full ? `Beide Plätze sind belegt (${a} und ${b}).`
+      : a || b ? `${a || b} wartet schon am Tisch – setz dich dazu.` : 'Noch niemand am Tisch. Setz dich hin und schick deinem Kumpel den Link.';
+    $('codeWrap').classList.toggle('hidden', !S.lobby.joinCode);
+    $('joinBtn').disabled = S.full;
+    return;
+  }
+  const g = S.game;
+  if (!g){
+    ['opp','starter','crib','pile','me','actions','log'].forEach(id => $(id).innerHTML = '');
+    $('oppBox').innerHTML = '<div class="pbox p1"><div class="face">?</div><div class="nm">wartet …</div><div class="sc">0</div></div>';
+    $('meBox').innerHTML = `<div class="pbox p0"><div class="face">${esc(S.lobby.names[S.seat][0].toUpperCase())}</div><div class="nm">Du</div><div class="sc">0</div></div>`;
+    $('breakdown').classList.add('hidden'); $('countWrap').classList.add('hidden');
+    drawBoard({me: 0, score: [0, 0], back: [0, 0]});
+    $('msg').className = 'prompt';
+    $('msg').textContent = `Warte auf deinen Kumpel – schick ihm diese Adresse: ${location.origin}`;
+    return;
+  }
+  const me = g.me, op = 1 - me, N = g.names;
+  $('oppBox').innerHTML = pbox(g, op, N[op]);
+  $('meBox').innerHTML = pbox(g, me, 'Du');
+  drawBoard(g);
+
+  fill('opp', g.opp.map(c => cardEl(c)));
+  fill('starter', [cardEl(g.starter)]);
+  $('cribLabel').textContent = g.dealer === me ? 'Deine Krippe' : 'Krippe ' + N[op];
+  fill('crib', g.crib.map(c => cardEl(c)));
+  fill('pile', (g.phase === 'peg' ? g.pile : []).map(c => { const el = cardEl(c); if (!shownPile.has(c.id)) el.classList.add('new'); return el; }));
+  shownPile = new Set(g.pile.map(c => c.id));
+  $('count').textContent = g.count;
+  $('countWrap').classList.toggle('hidden', g.phase !== 'peg');
+
+  const ids = new Set(g.hand.map(c => c.id)); [...sel].forEach(id => ids.has(id) || sel.delete(id));
+  const myTurn = g.phase === 'peg' && g.turn === me;
+  fill('me', g.hand.map(c => {
+    const el = cardEl(c);
+    if (g.phase === 'discard' && !g.discarded[me]){
+      el.classList.add('click'); if (sel.has(c.id)) el.classList.add('sel');
+      draggable(el, c, () => { if (sel.has(c.id)) sel.delete(c.id); else if (sel.size < 2) sel.add(c.id); render(); },
+        () => { sel.add(c.id); if (sel.size > 2) sel.delete([...sel][0]); if (sel.size === 2) discardSel(); else render(); });
+    } else if (myTurn){
+      if (g.count + val(c) <= 31){ el.classList.add('click'); const play = () => act({type: 'play', card: c.id}); draggable(el, c, play, play); }
+      else el.classList.add('dim');
+    }
+    return el;
+  }));
+
+  const bd = $('breakdown');
+  const showBd = g.breakdown && (g.phase === 'count' || g.phase === 'over');
+  bd.classList.toggle('hidden', !showBd);
+  if (showBd){
+    const b = g.breakdown, who = b.p === me ? b.label.replace(`von ${N[me]}`, '(deine)') : b.label;
+    bd.innerHTML = `<h3>${esc(who)}: ${b.pts} Punkte</h3><div class="mini" style="--cw:40px"></div>${
+      b.items.length ? '<ul>' + b.items.map(i => `<li>${itemText(i)}</li>`).join('') + '</ul>'
+      : '<div class="zero">Keine 15, kein Paar, keine Straße, kein Flush, kein Bube der Startfarbe.</div>'}`;
+    const cs = bd.querySelector('.mini');
+    cs.style.gap = '4px';
+    b.cards.forEach(c => cs.appendChild(cardEl(c)));
+    const st = cardEl(g.starter); st.style.marginLeft = '14px'; st.title = 'Startkarte'; cs.appendChild(st);
+    [...cs.children].forEach(x => x.style.margin = x === st ? '0 0 0 14px' : '0');
+  }
+
+  let m = '';
+  if (g.phase === 'over') m = g.winner === me ? `Gewonnen! ${g.score[me]} zu ${g.score[op]}.` : `${N[op]} hat gewonnen, ${g.score[op]} zu ${g.score[me]}.`;
+  else if (g.phase === 'discard') m = g.discarded[me] ? `Warte, bis ${N[op]} 2 Karten in die Krippe gelegt hat.`
+    : `Wähle 2 Karten für ${g.dealer === me ? 'deine Krippe' : 'die Krippe von ' + N[op]}`;
+  else if (g.phase === 'peg') m = myTurn ? 'Lege eine Karte' : `${N[op]} ist dran …`;
+  else if (g.phase === 'count') m = '';
+  $('msg').className = 'prompt' + (err ? ' err' : '');
+  $('msg').textContent = err || m;
+
+  const box = $('actions'); box.innerHTML = '';
+  const btn = (t, fn, dis) => { const b = document.createElement('button'); b.textContent = t; b.disabled = !!dis; b.onclick = fn; box.appendChild(b); };
+  if (g.phase === 'discard' && !g.discarded[me])
+    btn(sel.size === 2 ? 'In die Krippe legen' : `Noch ${2 - sel.size} Karte${sel.size === 1 ? '' : 'n'} wählen`, discardSel, sel.size !== 2);
+  const canDrop = (g.phase === 'discard' && !g.discarded[me]) || myTurn;
+  $('drop').classList.toggle('can', canDrop);
+  $('dropHint').textContent = !canDrop ? '' : g.phase === 'discard'
+    ? `Karten hierher ziehen oder anklicken – ${sel.size} von 2 für die Krippe`
+    : 'Karte hierher ziehen oder anklicken';
+  if (g.phase === 'count') btn(g.step < 2 ? 'Weiter zählen' : 'Nächste Runde', () => act({type: 'next', step: g.step}));
+  if (g.phase === 'over') btn('Neues Spiel', () => act({type: 'newgame'}));
+
+  $('log').innerHTML = g.log.slice().reverse().map(l => {
+    const t = esc(l.text).replace(/(Flush[^,)]*)/g, '<span class="flush">$1</span>');
+    return `<div class="${l.kind || ''}">${t}</div>`;
+  }).join('');
+}
+connect();
+</script>
+</body>
+</html>
