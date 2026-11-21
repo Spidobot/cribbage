@@ -215,6 +215,96 @@ body[data-skin="weltall"] .card.back{background:radial-gradient(circle at 30% 30
   .boardwrap .board{border-radius:80px 80px 14px 14px;width:170px;margin:0 auto;flex:none}
   .board svg{max-height:none;height:auto}
 }
+
+/* ---------- Ins Fenster einpassen: nie scrollen ---------- */
+html,body{height:100%;overflow:hidden}
+.join{min-height:0;height:100dvh;overflow:hidden}
+.table{height:100dvh;min-height:0;grid-template-columns:clamp(120px,13vw,180px) minmax(0,1fr) auto;gap:clamp(8px,1.4vw,18px);padding:clamp(8px,1.4vh,16px)}
+.side{min-height:0;gap:8px}
+.pbox .face{height:clamp(30px,7dvh,74px);font-size:clamp(20px,4dvh,40px)}
+.pbox .sc{font-size:clamp(22px,4.4dvh,38px)}
+.pbox .sbar{display:none;height:6px;background:rgba(0,0,0,.3)}
+.pbox .sbar i{display:block;height:100%;background:var(--gold);transition:width .8s}
+.starter{--cw:clamp(40px,min(5vw,9dvh),86px)}
+.mini{--cw:clamp(28px,min(3.4vw,6dvh),44px)}
+.mini .card + .card{margin-left:calc(var(--cw) * -0.6)}
+
+.center{min-height:0;gap:clamp(4px,1dvh,12px)}
+.hand{--cw:clamp(44px,min(8vw,14dvh),112px);flex:none}
+#opp{--cw:clamp(34px,min(6vw,10dvh),90px)}
+#me{padding-top:clamp(8px,2.6dvh,24px)}
+.card.sel{transform:translateY(calc(var(--cw) * -0.22))}
+.felt{min-height:0;overflow:visible;gap:clamp(4px,1dvh,10px);padding:4px}
+.pile{--cw:clamp(34px,min(5vw,9dvh),80px);min-height:0}
+.seq.old{--cw:clamp(24px,min(3.2vw,5.5dvh),50px)}
+.count{font-size:clamp(16px,2.6dvh,22px)} .count b{font-size:clamp(20px,3.4dvh,30px)}
+.prompt{font-size:clamp(16px,min(2.4vw,3.4dvh),32px);min-height:0}
+.actions{min-height:0}
+button{padding:clamp(6px,1.2dvh,10px) clamp(12px,1.6vw,20px)}
+.drophint{font-size:clamp(12px,1.8dvh,15px)}
+.breakdown{padding:clamp(6px,1.2dvh,12px) 14px;font-size:clamp(13px,1.9dvh,16px);max-width:680px;flex:none}
+.breakdown h3{font-size:clamp(14px,2.2dvh,18px);margin:0 0 4px}
+.breakdown .mini{--cw:clamp(26px,5dvh,40px)}
+.breakdown ul{margin:6px 0 0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:4px 6px}
+.breakdown ul li{background:rgba(255,255,255,.1);border-radius:8px;padding:2px 8px;font-size:.92em}
+.breakdown li{break-inside:avoid}
+.phase-count .seq,.phase-over .seq{--cw:clamp(22px,min(2.8vw,4.6dvh),44px)}
+
+.boardwrap{min-height:0;width:clamp(110px,calc((100dvh - 130px) * .31),240px);gap:8px}
+.brand{font-size:clamp(13px,1.9dvh,20px)}
+.brand img{width:clamp(26px,4.6dvh,44px);height:clamp(26px,4.6dvh,44px)}
+.board{min-height:0;padding:6px;border-radius:999px 999px 18px 18px}
+.board svg{max-height:none;height:100%}
+.tools{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.tools button{padding:6px 10px;font-size:14px}
+@media (max-width:1300px){.tools span{display:none}}
+
+.sheet{position:fixed;top:0;right:0;bottom:0;width:min(400px,100vw);z-index:70;background:#3d1d08;box-shadow:-8px 0 24px rgba(0,0,0,.5);display:flex;flex-direction:column;animation:slide .25s ease-out}
+@keyframes slide{from{transform:translateX(100%)}}
+.sheethead{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.15);font-size:17px}
+.sheetbody{flex:1;overflow:auto;padding:12px 14px}
+.sheetbody .stats{background:none;padding:0}
+.sheetbody .log{max-height:none;margin:0}
+.sheetbody .dlist{max-height:none}
+.prefs{gap:12px}
+
+.ceremony{overflow:hidden;padding:8px}
+.cbox h2{font-size:clamp(20px,min(5vw,5dvh),42px)}
+.podium{margin:clamp(6px,2dvh,18px) 0 6px}
+.step.first{height:clamp(90px,19dvh,190px)}
+.step.second{height:clamp(66px,13dvh,130px)}
+.step .crown{font-size:clamp(28px,5dvh,46px);margin-top:clamp(-58px,-6dvh,-34px)}
+.step .pl{font-size:clamp(20px,4dvh,34px)}
+.step .nm2{font-size:clamp(14px,2.4dvh,20px)}
+.cbox .cmp.big{font-size:clamp(11px,1.75dvh,15px)}
+.cbox .cmp.big td,.cbox .cmp.big th{padding:clamp(1px,.35dvh,4px) 8px}
+
+/* Handy & schmale Fenster: Brett weg, Balken im Spielerfeld */
+@media (max-width:900px), (max-aspect-ratio:4/5){
+  .table{grid-template-columns:1fr;grid-template-rows:auto auto minmax(0,1fr);padding:8px;gap:6px}
+  .boardwrap{order:-1;width:auto;flex-direction:row;align-items:center;justify-content:space-between}
+  .board{display:none}
+  .side{flex-direction:row;align-items:stretch;justify-content:space-between;gap:6px}
+  .side > div:first-child,.side > div:last-child{flex:1}
+  .side .deckrow{order:3;flex:none}
+  .side #meBox{order:2}
+  .pbox{border-width:3px}
+  .pbox .face{display:none}
+  .pbox .nm{font-size:14px}
+  .pbox .sc{font-size:22px;padding:0}
+  .pbox .gp{font-size:11px;padding:1px 0 2px}
+  .pbox .sbar{display:block}
+  .badge{font-size:11px;padding:1px 6px;margin-top:3px}
+  .lbl{font-size:10px;margin-bottom:2px}
+  .starter{--cw:clamp(30px,9vw,52px)}
+  .mini{--cw:clamp(24px,7vw,40px)}
+  .hand{--cw:clamp(40px,min(18vw,12dvh),100px)}
+  #opp{--cw:clamp(26px,min(10vw,7dvh),60px)}
+  .hand .card + .card{margin-left:calc(var(--cw) * -0.18)}
+  .pile{--cw:clamp(30px,min(12vw,8dvh),70px)}
+  .seq.old{--cw:clamp(22px,min(8vw,5dvh),44px)}
+  .tools span{display:none}
+}
 </style>
 </head>
 <body class="wood">
@@ -256,18 +346,26 @@ body[data-skin="weltall"] .card.back{background:radial-gradient(circle at 30% 30
   <div class="boardwrap">
     <a class="brand" href="/" title="Spidobot Cribbage"><img src="/logo.svg" alt=""><span>Spidobot <b>Cribbage</b></span></a>
     <div class="board"><svg id="board" viewBox="0 0 200 660" aria-label="Zählbrett"></svg></div>
-    <div class="stats prefs">
+    <div class="tools">
+      <button class="ghost" data-sheet="stats" title="Wie gut spielt ihr?">📊<span> Vergleich</span></button>
+      <button class="ghost" data-sheet="log" title="Verlauf">📜<span> Verlauf</span></button>
+      <button class="ghost" data-sheet="prefs" title="Einstellungen">⚙️</button>
+    </div>
+  </div>
+</div>
+
+<div class="sheet hidden" id="sheet">
+  <div class="sheethead"><b id="sheetTitle"></b><button class="ghost" id="sheetClose" title="Schließen">✕</button></div>
+  <div class="sheetbody">
+    <div class="stats" id="stats" data-pane="stats"></div>
+    <div class="log" id="log" data-pane="log"></div>
+    <div class="prefs" data-pane="prefs">
       <label>Kartenmotiv <select id="skinSel"></select></label>
       <label><input type="checkbox" id="soundChk"> Ton &amp; Ansage</label>
+      <div class="rule"><b>Flush zählt immer:</b> Hand und Krippe ab 4 Karten einer Farbe (+1 mit passender Startkarte), beim Auslegen ab 4 gleichfarbigen Karten in Folge, 1 Punkt pro Karte.</div>
+      <button class="ghost" id="leaveBtn">Tisch verlassen</button>
+      <div class="foot">© Spidobot · <a href="/impressum" target="_blank">Impressum</a></div>
     </div>
-    <div class="stats" id="stats"></div>
-    <details class="logbox">
-      <summary>Verlauf</summary>
-      <div class="log" id="log"></div>
-    </details>
-    <div class="rule"><b>Flush zählt immer:</b> Hand und Krippe ab 4 Karten einer Farbe (+1 mit passender Startkarte), beim Auslegen ab 4 gleichfarbigen Karten in Folge, 1 Punkt pro Karte.</div>
-    <button class="ghost" id="leaveBtn">Tisch verlassen</button>
-    <div class="foot">© Spidobot · <a href="/impressum" target="_blank">Impressum</a></div>
   </div>
 </div>
 <div id="fx"></div>
@@ -466,6 +564,18 @@ $('skinSel').onchange = e => { skin = e.target.value; pref.set('skin', skin); do
 $('soundChk').checked = soundOn;
 $('soundChk').onchange = e => { soundOn = e.target.checked; pref.set('sound', soundOn ? '1' : '0'); if (soundOn) say('Ton an'); };
 
+const SHEETS = {stats: 'Wie gut spielt ihr?', log: 'Verlauf', prefs: 'Einstellungen'};
+function openSheet(name){
+  const sh = $('sheet');
+  if (!sh.classList.contains('hidden') && sh.dataset.open === name) return closeSheet();
+  sh.dataset.open = name; $('sheetTitle').textContent = SHEETS[name];
+  sh.querySelectorAll('[data-pane]').forEach(el => el.classList.toggle('hidden', el.dataset.pane !== name));
+  sh.classList.remove('hidden');
+}
+function closeSheet(){ $('sheet').classList.add('hidden'); }
+document.querySelectorAll('[data-sheet]').forEach(b => b.onclick = () => openSheet(b.dataset.sheet));
+$('sheetClose').onclick = closeSheet;
+
 function discardSel(){ const cards = [...sel]; sel.clear(); act({type: 'discard', cards}); }
 
 /* Ziehen mit Maus oder Finger: kurzer Klick = onClick, auf den Tisch gezogen = onDrop */
@@ -510,7 +620,8 @@ function pbox(g, p, label){
   return `<div class="pbox p${p === g.me ? 0 : 1}${turn ? ' turn' : ''}">
     <div class="face">${esc(g.names[p].slice(0, 1).toUpperCase())}</div>
     <div class="nm">${esc(label)}</div><div class="sc">${g.score[p]}</div>
-    <div class="gp">gut gespielt ${g.stats[p].all.pct ?? '–'} %</div></div>
+    <div class="gp">gut gespielt ${g.stats[p].all.pct ?? '–'} %</div>
+    <div class="sbar"><i style="width:${g.score[p] / g.win * 100}%"></i></div></div>
     ${g.dealer === p ? '<div style="text-align:center"><span class="badge">Geber</span></div>' : ''}`;
 }
 
@@ -672,6 +783,7 @@ function render(){
     return;
   }
   const me = g.me, op = 1 - me, N = g.names;
+  ['discard', 'peg', 'count', 'over'].forEach(ph => $('app').classList.toggle('phase-' + ph, g.phase === ph));
   $('oppBox').innerHTML = pbox(g, op, N[op]);
   $('meBox').innerHTML = pbox(g, me, 'Du');
   updatePegs(g);
