@@ -8,7 +8,8 @@
   <Privileged>false</Privileged>
   <Support>https://github.com/spidobot/cribbage</Support>
   <Project>https://github.com/spidobot/cribbage</Project>
-  <Overview>Cribbage im Browser für zwei Spieler. Hausregel: Flush zählt immer.</Overview>
+  <Overview>Spidobot Cribbage – Cribbage im Browser für zwei Spieler. Hausregel: Flush zählt immer.</Overview>
+  <Icon>https://raw.githubusercontent.com/Spidobot/cribbage/main/public/logo.svg</Icon>
   <Category>GameServers:</Category>
   <WebUI>http://[IP]:[PORT:3000]/</WebUI>
   <TemplateURL>https://raw.githubusercontent.com/spidobot/cribbage/main/unraid/cribbage.xml</TemplateURL>

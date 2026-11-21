@@ -1,4 +1,4 @@
-# Cribbage für zwei
+# Spidobot Cribbage
 
 Cribbage im Browser für genau zwei Spieler, als kleiner Docker-Container (Node, keine Abhängigkeiten).
 

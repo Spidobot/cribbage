@@ -39,14 +39,14 @@ function json(res, code, obj) {
   res.end(JSON.stringify(obj));
 }
 
-const indexHtml = path.join(__dirname, 'public', 'index.html');
-
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://x');
   try {
-    if (req.method === 'GET' && url.pathname === '/') {
-      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-      return fs.createReadStream(indexHtml).pipe(res);
+    const page = { '/': ['index.html', 'text/html; charset=utf-8'], '/impressum': ['impressum.html', 'text/html; charset=utf-8'],
+      '/logo.svg': ['logo.svg', 'image/svg+xml'] }[url.pathname];
+    if (req.method === 'GET' && page) {
+      res.writeHead(200, { 'Content-Type': page[1] });
+      return fs.createReadStream(path.join(__dirname, 'public', page[0])).pipe(res);
     }
     if (req.method === 'GET' && url.pathname === '/api/events') {
       res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', Connection: 'keep-alive', 'X-Accel-Buffering': 'no' });

@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Cribbage</title>
+<title>Spidobot Cribbage</title>
+<link rel="icon" href="/logo.svg" type="image/svg+xml">
 <style>
 :root{
   --wood1:#a4521c; --wood2:#8a4216; --wood3:#b8662a; --ink:#fff8ec; --muted:#f3d9b8;
@@ -176,6 +177,18 @@ details.logbox summary{cursor:pointer;font-weight:700}
 .confetti{position:fixed;top:-20px;width:10px;height:16px;z-index:81;pointer-events:none;animation:fall linear forwards}
 @keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
 
+.brand{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font-size:20px;text-shadow:0 2px 3px rgba(0,0,0,.4)}
+.brand img{width:44px;height:44px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
+.brand b{color:var(--gold)}
+.brandbig{display:flex;align-items:center;gap:14px;margin-bottom:10px}
+.brandbig img{width:72px;height:72px;filter:drop-shadow(0 3px 5px rgba(0,0,0,.5))}
+.brandbig h1{margin:0}
+.foot{font-size:12px;color:var(--muted);text-align:center;margin-top:12px}
+.foot a{color:var(--muted)}
+body:not([data-skin]) .card.back,body[data-skin="klassisch"] .card.back{background-image:url(/logo.svg),
+  radial-gradient(circle at 50% 50%,transparent 28%,rgba(255,255,255,.15) 29% 31%,transparent 32%),
+  repeating-linear-gradient(45deg,#1f6f63 0 5px,#2a8577 5px 10px);background-size:55%,auto,auto;background-repeat:no-repeat;background-position:center}
+
 /* ---------- Motive ---------- */
 .card .pip.emo{font-size:calc(var(--cw) * .5);line-height:1}
 .card .pip.emo span{display:flex;flex-direction:column;align-items:center}
@@ -207,12 +220,13 @@ body[data-skin="weltall"] .card.back{background:radial-gradient(circle at 30% 30
 <body class="wood">
 <div class="join hidden" id="join">
   <div class="joinbox">
-    <h1>Cribbage</h1>
+    <div class="brandbig"><img src="/logo.svg" alt=""><div><h1>Spidobot Cribbage</h1><div class="rule">Zu zweit, im Browser, Flush zählt immer.</div></div></div>
     <div class="rule" id="joinInfo" style="margin-bottom:14px"></div>
     <label>Dein Name<input id="name" maxlength="20" autocomplete="nickname"></label>
     <label id="codeWrap" class="hidden">Passwort<input id="code" type="password" autocomplete="current-password"></label>
     <button id="joinBtn">Hinsetzen</button>
     <div class="prompt err hidden" id="joinErr" style="margin-top:14px"></div>
+    <div class="foot"><a href="/impressum">Impressum</a></div>
   </div>
 </div>
 
@@ -240,6 +254,7 @@ body[data-skin="weltall"] .card.back{background:radial-gradient(circle at 30% 30
   </div>
 
   <div class="boardwrap">
+    <a class="brand" href="/" title="Spidobot Cribbage"><img src="/logo.svg" alt=""><span>Spidobot <b>Cribbage</b></span></a>
     <div class="board"><svg id="board" viewBox="0 0 200 660" aria-label="Zählbrett"></svg></div>
     <div class="stats prefs">
       <label>Kartenmotiv <select id="skinSel"></select></label>
@@ -252,6 +267,7 @@ body[data-skin="weltall"] .card.back{background:radial-gradient(circle at 30% 30
     </details>
     <div class="rule"><b>Flush zählt immer:</b> Hand und Krippe ab 4 Karten einer Farbe (+1 mit passender Startkarte), beim Auslegen ab 4 gleichfarbigen Karten in Folge, 1 Punkt pro Karte.</div>
     <button class="ghost" id="leaveBtn">Tisch verlassen</button>
+    <div class="foot">© Spidobot · <a href="/impressum" target="_blank">Impressum</a></div>
   </div>
 </div>
 <div id="fx"></div>
