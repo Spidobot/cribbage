@@ -4,8 +4,19 @@ Cribbage im Browser für genau zwei Spieler, als kleiner Docker-Container (Node,
 
 **Hausregel „Flush zählt immer“**
 - Hand und Krippe: 4 Karten gleicher Farbe = 4 Punkte, +1 wenn die Startkarte dieselbe Farbe hat (die Krippe braucht also *keine* 5 Karten).
-- Auslegen: liegen die letzten 3 oder mehr Karten in Folge in derselben Farbe, gibt es 1 Punkt pro Karte (z. B. 3♥ 4♥ 5♥ = Straße 3 + Flush 3).
+- Auslegen: liegen die letzten 4 oder mehr Karten in Folge in derselben Farbe, gibt es 1 Punkt pro Karte (z. B. 3♥ 4♥ 5♥ 6♥ = Straße 4 + Flush 4). 3 gleichfarbige Karten sind kein Flush.
 - Die Mindestlänge beim Auslegen steht in `game.js` als `PEG_FLUSH_MIN`.
+
+## Was es kann
+
+- Karten mit der Maus oder dem Finger auf den Tisch ziehen (Klick geht auch)
+- Alles bleibt liegen: ausgelegte Folgen mit „Go“, „31“ und „Letzte Karte“, Punkte fliegen als Animation ein, Stecker wandern übers Brett
+- Ton & Ansage: Zählstand, „Go!“ und das klassische „fünfzehn 2, fünfzehn 4 …“ (abschaltbar)
+- 0 Punkte heißen „19“ – mit Clown und Clownslachen
+- Bewertung in %: wie gut war die Krippen-Auswahl und jede ausgelegte Karte – gemessen an den erwarteten Punkten mit dem, was man in dem Moment wissen konnte; dazu „gut gespielt“ gesamt und der direkte Vergleich beider Spieler
+- Siegerehrung mit Podest und Vergleichstabelle
+- Kartenmotive: Klassisch, Tierisch, Monster, Futter, Weltall (pro Browser wählbar)
+- Junge (J) statt Bube
 
 ## Unraid
 

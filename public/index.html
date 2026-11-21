@@ -105,6 +105,92 @@ details.logbox summary{cursor:pointer;font-weight:700}
 .log .win{color:var(--gold);font-weight:700}
 .rule{font-size:13px;color:var(--muted)}
 
+/* ---------- Ausgelegte Folgen ---------- */
+.pile{flex-direction:column;align-items:center;gap:6px}
+.seq{display:flex;align-items:center;gap:10px}
+.seq .cards{display:flex}
+.seq .cards .card + .card{margin-left:calc(var(--cw) * -0.35)}
+.seq.old{--cw:clamp(34px,3.6vw,50px);opacity:.75}
+.seq.old .cards .card + .card{margin-left:calc(var(--cw) * -0.45)}
+.chip{font-size:13px;font-weight:700;background:rgba(0,0,0,.45);border-radius:999px;padding:3px 10px;white-space:nowrap}
+.chip.go{background:#8e44ad} .chip.t31{background:#c0392b} .chip.last{background:#2c7a4b}
+
+/* ---------- Effekte ---------- */
+#fx{position:fixed;inset:0;pointer-events:none;z-index:60}
+.pop{position:absolute;transform:translate(-50%,-50%);font-weight:800;font-size:22px;padding:6px 14px;border-radius:12px;
+  box-shadow:0 6px 16px rgba(0,0,0,.4);white-space:nowrap;animation:pop 2.8s ease-out forwards;color:#fff}
+.pop small{display:block;font-size:13px;font-weight:600;opacity:.95}
+.pop.p0{background:var(--p0)} .pop.p1{background:var(--p1)}
+.pop.go{background:#8e44ad;font-size:28px;border-radius:50% 50% 50% 8px;padding:10px 18px}
+.pop.clown{background:#fff;color:#c0392b;font-size:64px;line-height:1;border:4px dashed #e74c3c;border-radius:50%;padding:14px 20px;animation:clown 3.2s ease-out forwards}
+.pop.clown small{font-size:15px;font-weight:800}
+@keyframes clown{0%{opacity:0;transform:translate(-50%,-50%) scale(.2) rotate(-40deg)}15%{opacity:1;transform:translate(-50%,-50%) scale(1.25) rotate(10deg)}25%{transform:translate(-50%,-50%) scale(1) rotate(-8deg)}35%{transform:translate(-50%,-50%) rotate(8deg)}45%{transform:translate(-50%,-50%) rotate(-5deg)}85%{opacity:1}100%{opacity:0;transform:translate(-50%,-80%)}}
+.pop.big{font-size:34px;background:var(--gold);color:#222;animation-duration:5s}
+@keyframes pop{0%{opacity:0;transform:translate(-50%,-30%) scale(.6)}10%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}
+  18%{transform:translate(-50%,-50%) scale(1)}80%{opacity:1;transform:translate(-50%,-70%)}100%{opacity:0;transform:translate(-50%,-90%)}}
+.pbox.flash{animation:flash .9s ease-out}
+@keyframes flash{0%{box-shadow:0 0 0 0 var(--gold)}40%{box-shadow:0 0 0 10px rgba(255,210,63,.6)}100%{box-shadow:0 4px 10px rgba(0,0,0,.35)}}
+.breakdown li{opacity:0;animation:li .4s ease-out forwards}
+@keyframes li{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:none}}
+.peg{transition:transform .9s cubic-bezier(.4,1.4,.6,1)}
+.card.flip{animation:flip .6s ease-out}
+@keyframes flip{0%{transform:rotateY(90deg)}100%{transform:none}}
+
+/* ---------- Bewertung ---------- */
+.stats{background:rgba(0,0,0,.35);border-radius:12px;padding:10px 12px;font-size:14px}
+.stats h4{margin:0 0 6px;font-size:15px}
+.stats table{width:100%;border-collapse:collapse}
+.stats td,.stats th{padding:3px 4px;text-align:right}
+.stats th{font-weight:600;color:var(--muted);font-size:12px}
+.stats td:first-child,.stats th:first-child{text-align:left}
+.pct{font-weight:800}
+.pct.good{color:#7ee08a} .pct.ok{color:var(--gold)} .pct.bad{color:#ff8a7a}
+.dlist{max-height:220px;overflow:auto;margin-top:8px;border-top:1px solid rgba(255,255,255,.15)}
+.dlist div{padding:4px 0;border-bottom:1px solid rgba(255,255,255,.1);font-size:13px}
+.dlist .why{color:var(--muted)}
+.summary{background:rgba(0,0,0,.45);border-radius:14px;padding:14px 18px;text-align:center;max-width:560px}
+.summary b{font-size:26px}
+
+.pbox .gp{font-size:12px;font-weight:700;padding:2px 0 5px;background:rgba(0,0,0,.25)}
+.cmp{margin-top:8px}
+.cmp td.lead{color:var(--gold);font-weight:800}
+.cmp td.lead::after{content:' ★'}
+
+/* ---------- Siegerehrung ---------- */
+.ceremony{position:fixed;inset:0;z-index:80;background:rgba(20,8,0,.82);display:grid;place-items:center;padding:16px;overflow:auto;animation:fade .6s}
+@keyframes fade{from{opacity:0}}
+.cbox{max-width:620px;width:100%;text-align:center}
+.cbox h2{font-size:clamp(26px,5vw,42px);margin:0 0 6px;color:var(--gold);text-shadow:0 3px 8px rgba(0,0,0,.6)}
+.podium{display:flex;justify-content:center;align-items:flex-end;gap:12px;margin:18px 0 10px}
+.step{width:min(42%,200px);border-radius:12px 12px 0 0;padding:10px 8px;color:#fff;box-shadow:0 6px 16px rgba(0,0,0,.4);animation:rise 1s cubic-bezier(.3,1.4,.5,1) backwards}
+.step.first{height:190px;background:linear-gradient(#f5c542,#c9971b);animation-delay:.5s;color:#2a1a00}
+.step.second{height:130px;background:linear-gradient(#cfd6dd,#8d99a5);animation-delay:.2s;color:#1d2530}
+@keyframes rise{from{transform:translateY(120%);opacity:0}}
+.step .crown{font-size:46px;margin-top:-58px;animation:bob 1.6s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-6px) rotate(-6deg)}}
+.step .nm2{font-size:20px;font-weight:800}
+.step .pl{font-size:34px;font-weight:900}
+.step .sub{font-size:13px;font-weight:700}
+.cbox .cmp.big{background:rgba(0,0,0,.35);border-radius:12px;padding:6px 10px;font-size:15px}
+.cbox .cmp.big td,.cbox .cmp.big th{padding:4px 8px}
+.confetti{position:fixed;top:-20px;width:10px;height:16px;z-index:81;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+
+/* ---------- Motive ---------- */
+.card .pip.emo{font-size:calc(var(--cw) * .5);line-height:1}
+.card .pip.emo span{display:flex;flex-direction:column;align-items:center}
+.card .pip.emo b{font-size:.4em;font-weight:400}
+.card .pip.many{display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:2% 6%;padding:22% 18%;font-size:calc(var(--cw) * .17)}
+.card .pip.many.n2,.card .pip.many.n3{flex-direction:column;flex-wrap:nowrap;font-size:calc(var(--cw) * .24)}
+.card .pip.many span{width:38%;text-align:center}
+.card.back .bk{position:absolute;inset:0;display:grid;place-items:center;font-size:calc(var(--cw) * .45);filter:drop-shadow(0 1px 2px rgba(0,0,0,.4))}
+body[data-skin="tiere"] .card.back{background:repeating-linear-gradient(45deg,#5b8c3a 0 6px,#6ea347 6px 12px)}
+body[data-skin="monster"] .card.back{background:repeating-linear-gradient(45deg,#4b2a6b 0 6px,#5e3685 6px 12px)}
+body[data-skin="futter"] .card.back{background:repeating-linear-gradient(45deg,#d9668b 0 6px,#e57fa0 6px 12px)}
+body[data-skin="weltall"] .card.back{background:radial-gradient(circle at 30% 30%,#fff 0 1px,transparent 2px),radial-gradient(circle at 70% 60%,#fff 0 1px,transparent 2px),#14183d}
+.prefs{display:flex;flex-direction:column;gap:6px}
+.prefs select{font:inherit;border-radius:8px;padding:3px 6px;margin-left:6px}
+
 @media (max-width:900px){
   .table{grid-template-columns:1fr;padding:12px;gap:12px}
   .side{flex-direction:row;align-items:stretch}
@@ -155,16 +241,22 @@ details.logbox summary{cursor:pointer;font-weight:700}
 
   <div class="boardwrap">
     <div class="board"><svg id="board" viewBox="0 0 200 660" aria-label="Zählbrett"></svg></div>
+    <div class="stats prefs">
+      <label>Kartenmotiv <select id="skinSel"></select></label>
+      <label><input type="checkbox" id="soundChk"> Ton &amp; Ansage</label>
+    </div>
+    <div class="stats" id="stats"></div>
     <details class="logbox">
       <summary>Verlauf</summary>
       <div class="log" id="log"></div>
     </details>
-    <div class="rule"><b>Flush zählt immer:</b> Hand und Krippe ab 4 Karten einer Farbe (+1 mit passender Startkarte), beim Auslegen ab 3 gleichfarbigen Karten in Folge, 1 Punkt pro Karte.</div>
+    <div class="rule"><b>Flush zählt immer:</b> Hand und Krippe ab 4 Karten einer Farbe (+1 mit passender Startkarte), beim Auslegen ab 4 gleichfarbigen Karten in Folge, 1 Punkt pro Karte.</div>
     <button class="ghost" id="leaveBtn">Tisch verlassen</button>
   </div>
 </div>
+<div id="fx"></div>
 <script>
-const RN = ['','A','2','3','4','5','6','7','8','9','10','B','D','K'];
+const RN = ['','A','2','3','4','5','6','7','8','9','10','J','D','K'];
 const val = c => Math.min(c.r, 10);
 const fmt = c => RN[c.r] + c.s;
 const $ = id => document.getElementById(id);
@@ -174,12 +266,89 @@ const store = {
   get(){ try { return localStorage.getItem('cribbageToken') || ''; } catch { return ''; } },
   set(t){ try { t ? localStorage.setItem('cribbageToken', t) : localStorage.removeItem('cribbageToken'); } catch {} }
 };
-let token = store.get(), S = null, sel = new Set(), err = '', es = null, shownPile = new Set();
+let token = store.get(), S = null, sel = new Set(), err = '', es = null, lastEv = null;
 
 function connect(){
   if (es) es.close();
   es = new EventSource('/api/events?token=' + encodeURIComponent(token));
-  es.onmessage = e => { S = JSON.parse(e.data); if (S.seat < 0 && token){ token = ''; store.set(''); connect(); } err = ''; render(); };
+  es.onmessage = e => {
+    const before = snapshot();
+    S = JSON.parse(e.data);
+    if (S.seat < 0 && token){ token = ''; store.set(''); connect(); }
+    err = ''; render(); effects(before);
+  };
+}
+
+/* ---------- Animationen ---------- */
+// Positionen vor dem Neuzeichnen merken, damit Karten von dort losfliegen
+function snapshot(){
+  const r = {};
+  document.querySelectorAll('#me .card[data-id]').forEach(el => r[el.dataset.id] = el.getBoundingClientRect());
+  const opp = $('opp').getBoundingClientRect();
+  return {cards: r, opp};
+}
+function centerOf(el){ const r = el.getBoundingClientRect(); return {x: r.left + r.width / 2, y: r.top + r.height / 2}; }
+function popup(html, at, cls, delay){
+  setTimeout(() => {
+    const d = document.createElement('div'); d.className = 'pop ' + cls; d.innerHTML = html;
+    d.style.left = at.x + 'px'; d.style.top = at.y + 'px';
+    $('fx').appendChild(d); setTimeout(() => d.remove(), cls.includes('big') ? 5200 : 3000);
+  }, delay);
+}
+function effects(before){
+  const g = S && S.game;
+  if (!g){ lastEv = null; return; }
+  const evs = g.events;
+  if (lastEv === null){ lastEv = evs.length ? evs[evs.length - 1].id : 0; return; } // beim Laden nichts nachspielen
+  const fresh = evs.filter(e => e.id > lastEv);
+  if (!fresh.length) return;
+  lastEv = fresh[fresh.length - 1].id;
+  const me = g.me, side = p => (p === me ? 0 : 1);
+  let t = 0, prev = null;
+  for (const e of fresh){
+    if (e.kind === 'play'){
+      const el = document.querySelector(`#pile .card[data-id="${e.card}"]`);
+      if (el){
+        const to = el.getBoundingClientRect();
+        const from = e.p === me && before.cards[e.card] ? before.cards[e.card]
+          : {left: before.opp.left + before.opp.width / 2 - to.width / 2, top: before.opp.top, width: to.width, height: to.height};
+        el.animate([{transform: `translate(${from.left - to.left}px,${from.top - to.top}px) rotate(${e.p === me ? -8 : 8}deg)`}, {transform: 'none'}],
+          {duration: 550, delay: t, easing: 'cubic-bezier(.2,.8,.3,1)', fill: 'backwards'});
+      }
+      snap(t / 1000 + 0.45);
+      say(String(e.count), t + 450);
+      t += 450;
+    } else if (e.kind === 'count'){
+      if (e.pts === 0){
+        // Null Punkte heißen „19“ – Clown für den Pechvogel
+        const at = centerOf($(e.p === me ? 'meBox' : 'oppBox'));
+        popup(`🤡<small>19! ${e.p === me ? 'Du hast' : esc(g.names[e.p]) + ' hat'} nichts</small>`, {x: at.x + 70, y: at.y}, 'clown', t + 200);
+        clownLaugh(t + 300);
+      } else if (g.breakdown) say(countSpeech(g.breakdown), t + 300);
+    } else if (e.kind === 'points'){
+      const pegging = prev && (prev.kind === 'play' || prev.kind === 'points');
+      const at = pegging || g.phase === 'peg' ? centerOf($('pile')) : centerOf($(e.p === me ? 'meBox' : 'oppBox'));
+      if (pegging || g.phase === 'peg') at.y -= 30;
+      popup(`+${e.pts}<small>${esc(e.why)}</small>`, at, 'p' + side(e.p), t);
+      chime(e.pts, t / 1000);
+      if (!prev || prev.kind !== 'count') say(e.why.replace(/\+(\d+)/g, 'für $1').replace(/ · /g, ', '), t + 200);
+      const box = $(e.p === me ? 'meBox' : 'oppBox').firstElementChild;
+      setTimeout(() => { box && box.classList.remove('flash'); void (box && box.offsetWidth); box && box.classList.add('flash'); }, t);
+      t += 700;
+    } else if (e.kind === 'go'){
+      const at = centerOf($(e.p === me ? 'meBox' : 'oppBox'));
+      popup(`Go!<small>${e.p === me ? 'Du kannst' : esc(g.names[e.p]) + ' kann'} nicht unter 31 (${e.count})</small>`, {x: at.x + 60, y: at.y}, 'go', t);
+      tone(220, 0.25, 'sawtooth', 0.08, t / 1000); say('Go!', t);
+      t += 900;
+    } else if (e.kind === 'starter'){
+      const s = document.querySelector('#starter .card'); if (s) setTimeout(() => s.classList.add('flip'), t);
+    } else if (e.kind === 'win'){
+      popup(e.p === me ? 'Gewonnen!' : esc(g.names[e.p]) + ' gewinnt!', centerOf($('drop')), 'big', t + 400);
+      chime(6, t / 1000 + 0.4); chime(6, t / 1000 + 0.9);
+      say(e.p === me ? 'Gewonnen!' : g.names[e.p] + ' gewinnt!', t + 600);
+    }
+    prev = e;
+  }
 }
 async function post(url, body){
   const r = await fetch(url, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)});
@@ -201,15 +370,86 @@ $('joinBtn').onclick = async () => {
 $('name').onkeydown = $('code').onkeydown = e => { if (e.key === 'Enter') $('joinBtn').click(); };
 $('leaveBtn').onclick = () => { if (confirm('Tisch wirklich verlassen? Das laufende Spiel wird beendet.')) act({type: 'leave'}).then(() => { token = ''; store.set(''); connect(); }); };
 
+/* ---------- Kartenmotive (Skin-Pack), pro Browser gespeichert ---------- */
+const SKINS = {
+  klassisch: {name: 'Klassisch'},
+  tiere:   {name: 'Tierisch', suit: {'♠': '🐧', '♥': '🐷', '♦': '🦊', '♣': '🐸'}, face: {11: '🐶', 12: '🐱', 13: '🦁'}, back: '🐾'},
+  monster: {name: 'Monster',  suit: {'♠': '👻', '♥': '👹', '♦': '👽', '♣': '🧟'}, face: {11: '🤡', 12: '🧛', 13: '🐲'}, back: '👾'},
+  futter:  {name: 'Futter',   suit: {'♠': '🍆', '♥': '🍓', '♦': '🍕', '♣': '🥦'}, face: {11: '🌭', 12: '🧁', 13: '🍔'}, back: '🍩'},
+  weltall: {name: 'Weltall',  suit: {'♠': '🚀', '♥': '🪐', '♦': '⭐', '♣': '☄️'}, face: {11: '🧑‍🚀', 12: '👩‍🚀', 13: '🛸'}, back: '🌙'},
+};
+const pref = {
+  get(k, d){ try { return localStorage.getItem('cribbage.' + k) ?? d; } catch { return d; } },
+  set(k, v){ try { localStorage.setItem('cribbage.' + k, v); } catch {} }
+};
+let skin = SKINS[pref.get('skin', 'klassisch')] ? pref.get('skin', 'klassisch') : 'klassisch';
+document.body.dataset.skin = skin;
+
 function cardEl(c){
-  const d = document.createElement('div');
-  if (!c){ d.className = 'card back'; return d; }
+  const d = document.createElement('div'), sk = SKINS[skin];
+  if (!c){ d.className = 'card back'; if (sk.back) d.innerHTML = `<div class="bk">${sk.back}</div>`; return d; }
   d.className = 'card' + (c.s === '♥' || c.s === '♦' ? ' red' : '');
+  d.dataset.id = c.id;
   const ix = `${RN[c.r]}<i>${c.s}</i>`;
-  const pip = c.r > 10 ? `<div class="pip court"><span>${RN[c.r]}${c.s}</span></div>` : `<div class="pip">${c.s}</div>`;
+  let pip;
+  if (sk.suit){
+    const m = sk.suit[c.s];
+    pip = c.r > 10 ? `<div class="pip emo"><span>${sk.face[c.r]}<b>${m}</b></span></div>`
+      : c.r === 1 ? `<div class="pip emo"><span>${m}</span></div>`
+      : `<div class="pip emo many n${c.r}">${Array(c.r).fill(`<span>${m}</span>`).join('')}</div>`;
+  } else pip = c.r > 10 ? `<div class="pip court"><span>${RN[c.r]}${c.s}</span></div>` : `<div class="pip">${c.s}</div>`;
   d.innerHTML = `<div class="ix">${ix}</div>${pip}<div class="ix br">${ix}</div>`;
   return d;
 }
+
+/* ---------- Ton: Geräusche + Ansage (Go, Zählen) ---------- */
+let soundOn = pref.get('sound', '1') === '1', actx = null;
+function tone(freq, dur, type = 'triangle', vol = 0.15, delay = 0){
+  if (!soundOn) return;
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const o = actx.createOscillator(), g = actx.createGain(), t = actx.currentTime + delay;
+    o.type = type; o.frequency.setValueAtTime(freq, t);
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    o.connect(g); g.connect(actx.destination); o.start(t); o.stop(t + dur);
+  } catch {}
+}
+function snap(delay){ tone(1400, 0.05, 'square', 0.06, delay); tone(300, 0.08, 'triangle', 0.12, delay); }
+function chime(n, delay){ for (let i = 0; i < Math.min(n, 6); i++) tone(660 * Math.pow(1.122, i), 0.18, 'sine', 0.12, delay + i * 0.07); }
+function say(text, delayMs = 0, pitch = 1, rate = 1.05){
+  if (!soundOn || !window.speechSynthesis) return;
+  setTimeout(() => {
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'de-DE'; u.rate = rate; u.pitch = pitch;
+    const v = speechSynthesis.getVoices().find(v => v.lang && v.lang.startsWith('de')); if (v) u.voice = v;
+    speechSynthesis.speak(u);
+  }, delayMs);
+}
+// Hupe + Clownslachen
+function clownLaugh(delayMs){
+  const d = delayMs / 1000;
+  tone(330, 0.18, 'square', 0.1, d); tone(262, 0.3, 'square', 0.1, d + 0.2);
+  for (let i = 0; i < 6; i++) tone(520 - i * 35, 0.11, 'sawtooth', 0.07, d + 0.6 + i * 0.13);
+  say('Neunzehn!', delayMs + 300);
+  say('Hahaha, hahaha, ha ha!', delayMs + 900, 1.9, 1.35);
+}
+// Klassisch angesagt: „15 – 2, 15 – 4, Paar macht 6 …“
+function countSpeech(b){
+  if (!b.items.length) return 'Neunzehn!';
+  let sum = 0;
+  const parts = b.items.map(i => {
+    sum += i.p;
+    const n = {'15': 'fünfzehn', Paar: 'Paar', 'Straße': 'Straße', Flush: 'Flush', 'Junge der Startfarbe': 'Junge'}[i.t] || i.t;
+    return i.t === '15' ? `fünfzehn ${sum}` : `${n} ${sum}`;
+  });
+  return parts.join(', ') + '.';
+}
+$('skinSel').innerHTML = Object.entries(SKINS).map(([k, s]) => `<option value="${k}">${s.name}</option>`).join('');
+$('skinSel').value = skin;
+$('skinSel').onchange = e => { skin = e.target.value; pref.set('skin', skin); document.body.dataset.skin = skin; render(); };
+$('soundChk').checked = soundOn;
+$('soundChk').onchange = e => { soundOn = e.target.checked; pref.set('sound', soundOn ? '1' : '0'); if (soundOn) say('Ton an'); };
+
 function discardSel(){ const cards = [...sel]; sel.clear(); act({type: 'discard', cards}); }
 
 /* Ziehen mit Maus oder Finger: kurzer Klick = onClick, auf den Tisch gezogen = onDrop */
@@ -253,7 +493,8 @@ function pbox(g, p, label){
   const turn = g.phase === 'peg' && g.turn === p;
   return `<div class="pbox p${p === g.me ? 0 : 1}${turn ? ' turn' : ''}">
     <div class="face">${esc(g.names[p].slice(0, 1).toUpperCase())}</div>
-    <div class="nm">${esc(label)}</div><div class="sc">${g.score[p]}</div></div>
+    <div class="nm">${esc(label)}</div><div class="sc">${g.score[p]}</div>
+    <div class="gp">gut gespielt ${g.stats[p].all.pct ?? '–'} %</div></div>
     ${g.dealer === p ? '<div style="text-align:center"><span class="badge">Geber</span></div>' : ''}`;
 }
 
@@ -266,8 +507,26 @@ function holePos(n, lane){ // n 1..120, lane 0 = außen, 1 = innen
   const x = up ? (lane ? 62 : 38) : (lane ? 138 : 162);
   return {x, y};
 }
-function drawBoard(g){
+// Stecker: je Spieler zwei, der hintere springt über den vorderen
+const pegState = {};
+function updatePegs(g){
+  if (!$('board').firstChild) drawBoard();
   const me = g.me, op = 1 - me;
+  [[me, 0], [op, 1]].forEach(([p, lane]) => {
+    const key = 'l' + lane, front = g.score[p], back = g.back[p];
+    let st = pegState[key];
+    if (!st || st.game !== g.names.join()) st = pegState[key] = {a: back, b: front, game: g.names.join()};
+    else if (!(st.a === back && st.b === front) && !(st.b === back && st.a === front)){
+      if (st.a === back) st.b = front; else if (st.b === back) st.a = front; else { st.a = back; st.b = front; }
+    }
+    ['a', 'b'].forEach(w => {
+      const pos = holePos(st[w], lane), el = $(`peg-${lane}-${w}`);
+      el.style.transform = `translate(${pos.x}px,${pos.y}px)`;
+      el.style.opacity = w === 'a' && st.a === st.b ? 0 : 1;
+    });
+  });
+}
+function drawBoard(){
   let h = `<path d="M38 88 A62 62 0 0 1 162 88" fill="none" stroke="rgba(0,0,0,.25)" stroke-width="30"/>
     <path d="M38 88 A62 62 0 0 1 162 88" fill="none" stroke="${'var(--p0)'}" stroke-width="10" opacity=".55"/>
     <path d="M62 88 A38 38 0 0 1 138 88" fill="none" stroke="${'var(--p1)'}" stroke-width="10" opacity=".55"/>`;
@@ -288,16 +547,87 @@ function drawBoard(g){
   h += `<circle cx="100" cy="26" r="4" fill="#2a1606"/><text x="100" y="46" font-size="9" text-anchor="middle" fill="rgba(0,0,0,.45)">121</text>`;
   h += `<rect x="30" y="632" width="40" height="18" rx="4" fill="rgba(0,0,0,.18)"/>`;
   h += `<circle cx="38" cy="640" r="2.3" fill="#2a1606"/><circle cx="62" cy="640" r="2.3" fill="#2a1606"/>`;
-  const peg = (n, lane, color) => {
-    const p = holePos(n, lane);
-    return `<g transform="translate(${p.x} ${p.y})"><ellipse cx="1.5" cy="2" rx="5" ry="3" fill="rgba(0,0,0,.3)"/>
+  for (const [lane, color] of [[0, 'var(--p0)'], [1, 'var(--p1)']]) for (const w of ['a', 'b']){
+    const p = holePos(0, lane);
+    h += `<g class="peg" id="peg-${lane}-${w}" style="transform:translate(${p.x}px,${p.y}px)"><ellipse cx="1.5" cy="2" rx="5" ry="3" fill="rgba(0,0,0,.3)"/>
       <circle r="5.2" fill="${color}" stroke="rgba(0,0,0,.45)" stroke-width="1"/><circle cx="-1.6" cy="-1.8" r="1.6" fill="rgba(255,255,255,.7)"/></g>`;
-  };
-  [[me, 0, 'var(--p0)'], [op, 1, 'var(--p1)']].forEach(([p, lane, col]) => {
-    if (g.back[p] !== g.score[p]) h += peg(g.back[p], lane, col);
-    h += peg(g.score[p], lane, col);
-  });
+  }
   $('board').innerHTML = h;
+}
+
+/* ---------- Bewertung: wie gut war die Wahl mit dem, was man wusste ---------- */
+const num = x => x.toFixed(1).replace('.', ',').replace('-', '−');
+function pctHtml(p){
+  if (p === null || p === undefined) return '<span class="pct">–</span>';
+  return `<span class="pct ${p >= 90 ? 'good' : p >= 60 ? 'ok' : 'bad'}">${p} %</span>`;
+}
+// Beide Spieler nebeneinander: wer führt, ist markiert
+const TALLY = [['peg', 'Punkte beim Auslegen', 1], ['hand', 'Punkte aus Händen', 1], ['crib', 'Punkte aus der Krippe', 1],
+  ['best', 'Beste Hand', 1], ['flush', 'Flushes', 1], ['go', 'Go-Punkte', 1], ['t31', 'Genau 31', 1], ['zero', '19er 🤡', -1]];
+function compareTable(g, big){
+  const me = g.me, op = 1 - me, T = g.tally;
+  const line = (label, a, b, dir, fmtv = x => x) => {
+    const lead = a === null || b === null || a === b ? -1 : (a - b) * dir > 0 ? 0 : 1;
+    return `<tr><td>${label}</td><td class="${lead === 0 ? 'lead' : ''}">${a === null ? '–' : fmtv(a)}</td><td class="${lead === 1 ? 'lead' : ''}">${b === null ? '–' : fmtv(b)}</td></tr>`;
+  };
+  const pc = x => x + ' %', st = g.stats;
+  const rows = line('<b>Gut gespielt</b>', st[me].all.pct, st[op].all.pct, 1, pc)
+    + line('Auswahl (Krippe)', st[me].discard.pct, st[op].discard.pct, 1, pc)
+    + line('Auslegen', st[me].peg.pct, st[op].peg.pct, 1, pc)
+    + line('Verschenkt (erwartet)', +st[me].all.lost.toFixed(1), +st[op].all.lost.toFixed(1), -1, x => num(x) + ' Pkt')
+    + TALLY.map(([k, label, dir]) => line(label, T[me][k], T[op][k], dir)).join('');
+  return `<table class="cmp${big ? ' big' : ''}"><tr><th></th><th>Du</th><th>${esc(g.names[op])}</th></tr>${rows}</table>`;
+}
+/* ---------- Siegerehrung ---------- */
+let ceremonyClosed = false;
+function confetti(){
+  const cols = ['#ffd23f', '#d8452b', '#2f8fd0', '#7ee08a', '#ffffff', '#c86bfa'];
+  for (let i = 0; i < 90; i++){
+    const c = document.createElement('div'); c.className = 'confetti';
+    c.style.left = Math.random() * 100 + 'vw'; c.style.background = cols[i % cols.length];
+    c.style.animationDuration = 2.5 + Math.random() * 3 + 's'; c.style.animationDelay = Math.random() * 1.5 + 's';
+    c.style.borderRadius = Math.random() < .4 ? '50%' : '2px';
+    document.body.appendChild(c); setTimeout(() => c.remove(), 7500);
+  }
+}
+function renderCeremony(g){
+  let el = $('ceremony');
+  if (g.phase !== 'over'){ if (el) el.remove(); ceremonyClosed = false; return; }
+  if (ceremonyClosed || el) return;
+  const w = g.winner, l = 1 - w, me = g.me, nm = p => (p === me ? 'Du' : esc(g.names[p])), st = g.stats;
+  el = document.createElement('div'); el.id = 'ceremony'; el.className = 'ceremony';
+  el.innerHTML = `<div class="cbox">
+    <h2>${w === me ? 'Du hast gewonnen!' : esc(g.names[w]) + ' hat gewonnen!'}</h2>
+    <div>${g.score[w]} zu ${g.score[l]} nach ${g.round} Runden${g.score[l] < 91 ? ' – Skunk! (unter 91)' : ''}</div>
+    <div class="podium">
+      <div class="step second"><div class="nm2">${nm(l)}</div><div class="pl">2.</div><div class="sub">${g.score[l]} Punkte<br>gut gespielt ${st[l].all.pct ?? '–'} %</div></div>
+      <div class="step first"><div class="crown">👑</div><div class="nm2">${nm(w)}</div><div class="pl">1.</div><div class="sub">${g.score[w]} Punkte<br>gut gespielt ${st[w].all.pct ?? '–'} %</div></div>
+    </div>
+    ${compareTable(g, true)}
+    <div class="actions" style="margin-top:14px"><button id="cNew">Neues Spiel</button><button class="ghost" id="cClose">Tisch ansehen</button></div>
+  </div>`;
+  document.body.appendChild(el);
+  el.querySelector('#cNew').onclick = () => act({type: 'newgame'});
+  el.querySelector('#cClose').onclick = () => { ceremonyClosed = true; el.remove(); };
+  confetti();
+}
+
+function renderStats(g){
+  const me = g.me, op = 1 - me, N = g.names;
+  const list = g.decisions.slice().reverse().map(d => {
+    const who = d.p === me ? 'Du' : esc(N[d.p]);
+    const cards = d.chosen.map(fmt).join(' ');
+    const what = d.kind === 'discard' ? `${cards} in die Krippe` : `${cards} bei ${d.count}`;
+    const better = d.pct >= 99 ? '✓ beste Wahl'
+      : d.kind === 'discard'
+        ? `besser: ${d.best.map(fmt).join(' ')} (Ø ${num(d.bestEv)} statt ${num(d.ev)} Pkt)`
+        : `besser: ${d.best.map(fmt).join(' ')} (Ø ${num(d.bestEv)} statt ${num(d.ev)} Pkt)`;
+    return `<div>R${d.round} · ${who}: ${esc(what)} – ${pctHtml(d.pct)}<br><span class="why">${esc(better)}</span></div>`;
+  }).join('');
+  $('stats').innerHTML = `<h4>Wie gut spielt ihr?</h4>
+    ${compareTable(g)}
+    <div class="why" style="font-size:12px;margin-top:4px">100 % = bestmögliche Wahl mit dem, was ihr in dem Moment wissen konntet (erwartete Punkte). Die Bewertung von ${esc(N[op])} siehst du erst nach dem Auslegen.</div>
+    ${list ? `<div class="dlist">${list}</div>` : ''}`;
 }
 
 function render(){
@@ -319,7 +649,8 @@ function render(){
     $('oppBox').innerHTML = '<div class="pbox p1"><div class="face">?</div><div class="nm">wartet …</div><div class="sc">0</div></div>';
     $('meBox').innerHTML = `<div class="pbox p0"><div class="face">${esc(S.lobby.names[S.seat][0].toUpperCase())}</div><div class="nm">Du</div><div class="sc">0</div></div>`;
     $('breakdown').classList.add('hidden'); $('countWrap').classList.add('hidden');
-    drawBoard({me: 0, score: [0, 0], back: [0, 0]});
+    $('stats').innerHTML = '';
+    updatePegs({me: 0, score: [0, 0], back: [0, 0], names: ['wait']});
     $('msg').className = 'prompt';
     $('msg').textContent = `Warte auf deinen Kumpel – schick ihm diese Adresse: ${location.origin}`;
     return;
@@ -327,14 +658,29 @@ function render(){
   const me = g.me, op = 1 - me, N = g.names;
   $('oppBox').innerHTML = pbox(g, op, N[op]);
   $('meBox').innerHTML = pbox(g, me, 'Du');
-  drawBoard(g);
+  updatePegs(g);
 
   fill('opp', g.opp.map(c => cardEl(c)));
   fill('starter', [cardEl(g.starter)]);
   $('cribLabel').textContent = g.dealer === me ? 'Deine Krippe' : 'Krippe ' + N[op];
   fill('crib', g.crib.map(c => cardEl(c)));
-  fill('pile', (g.phase === 'peg' ? g.pile : []).map(c => { const el = cardEl(c); if (!shownPile.has(c.id)) el.classList.add('new'); return el; }));
-  shownPile = new Set(g.pile.map(c => c.id));
+
+  // Alle Folgen der Runde bleiben liegen; abgeschlossene werden kleiner
+  const seqs = g.seqs.filter(s => s.cards.length);
+  fill('pile', seqs.map((s, i) => {
+    const row = document.createElement('div');
+    const done = !!s.end || g.phase !== 'peg';
+    row.className = 'seq' + (done && i < seqs.length - 1 || g.phase !== 'peg' ? ' old' : '');
+    const cs = document.createElement('div'); cs.className = 'cards';
+    s.cards.forEach(c => cs.appendChild(cardEl(c)));
+    row.appendChild(cs);
+    if (s.end){
+      const who = s.end.p === me ? 'Du' : N[s.end.p];
+      const txt = {go: `Go · +1 ${who}`, '31': `31 · +2 ${who}`, last: `Letzte Karte · +1 ${who}`}[s.end.type];
+      row.insertAdjacentHTML('beforeend', `<span class="chip ${s.end.type === '31' ? 't31' : s.end.type}">${esc(txt)}</span>`);
+    }
+    return row;
+  }));
   $('count').textContent = g.count;
   $('countWrap').classList.toggle('hidden', g.phase !== 'peg');
 
@@ -357,10 +703,10 @@ function render(){
   const showBd = g.breakdown && (g.phase === 'count' || g.phase === 'over');
   bd.classList.toggle('hidden', !showBd);
   if (showBd){
-    const b = g.breakdown, who = b.p === me ? b.label.replace(`von ${N[me]}`, '(deine)') : b.label;
-    bd.innerHTML = `<h3>${esc(who)}: ${b.pts} Punkte</h3><div class="mini" style="--cw:40px"></div>${
-      b.items.length ? '<ul>' + b.items.map(i => `<li>${itemText(i)}</li>`).join('') + '</ul>'
-      : '<div class="zero">Keine 15, kein Paar, keine Straße, kein Flush, kein Bube der Startfarbe.</div>'}`;
+    const b = g.breakdown, who = b.p === me ? (b.label.startsWith('Krippe') ? 'Deine Krippe' : 'Deine Hand') : b.label;
+    bd.innerHTML = `<h3>${esc(who)}: ${b.pts ? b.pts + ' Punkte' : '19 🤡 <span class="zero">(also 0 Punkte)</span>'}</h3><div class="mini" style="--cw:40px"></div>${
+      b.items.length ? '<ul>' + b.items.map((i, k) => `<li style="animation-delay:${0.25 + k * 0.35}s">${itemText(i)}</li>`).join('') + '</ul>'
+      : '<div class="zero">Keine 15, kein Paar, keine Straße, kein Flush, kein Junge der Startfarbe.</div>'}`;
     const cs = bd.querySelector('.mini');
     cs.style.gap = '4px';
     b.cards.forEach(c => cs.appendChild(cardEl(c)));
@@ -370,9 +716,11 @@ function render(){
 
   let m = '';
   if (g.phase === 'over') m = g.winner === me ? `Gewonnen! ${g.score[me]} zu ${g.score[op]}.` : `${N[op]} hat gewonnen, ${g.score[op]} zu ${g.score[me]}.`;
+  if (g.phase === 'over') m += ` Gut gespielt insgesamt: Du ${g.stats[me].all.pct ?? '–'} %, ${N[op]} ${g.stats[op].all.pct ?? '–'} %.`;
   else if (g.phase === 'discard') m = g.discarded[me] ? `Warte, bis ${N[op]} 2 Karten in die Krippe gelegt hat.`
     : `Wähle 2 Karten für ${g.dealer === me ? 'deine Krippe' : 'die Krippe von ' + N[op]}`;
   else if (g.phase === 'peg') m = myTurn ? 'Lege eine Karte' : `${N[op]} ist dran …`;
+  else if (g.phase === 'count' && g.step < 0) m = 'Alle Karten liegen – schaut sie euch an, dann wird gezählt.';
   else if (g.phase === 'count') m = '';
   $('msg').className = 'prompt' + (err ? ' err' : '');
   $('msg').textContent = err || m;
@@ -386,7 +734,9 @@ function render(){
   $('dropHint').textContent = !canDrop ? '' : g.phase === 'discard'
     ? `Karten hierher ziehen oder anklicken – ${sel.size} von 2 für die Krippe`
     : 'Karte hierher ziehen oder anklicken';
-  if (g.phase === 'count') btn(g.step < 2 ? 'Weiter zählen' : 'Nächste Runde', () => act({type: 'next', step: g.step}));
+  if (g.phase === 'count') btn(g.step < 0 ? 'Hände zählen' : g.step < 2 ? 'Weiter zählen' : 'Nächste Runde', () => act({type: 'next', step: g.step}));
+  renderStats(g);
+  renderCeremony(g);
   if (g.phase === 'over') btn('Neues Spiel', () => act({type: 'newgame'}));
 
   $('log').innerHTML = g.log.slice().reverse().map(l => {
